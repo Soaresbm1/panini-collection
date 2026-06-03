@@ -1,0 +1,287 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0a1628">
+  <title>Panini 2026 — Ma Collection</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/icon-16.png">
+
+  <!-- iOS spécifique (Safari ne lit pas toujours le manifest) -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/icon-180.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Panini 26">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- Écran de connexion (affiché si non connecté) -->
+  <div id="signedOut">
+    <div class="hero-brand">PANINI</div>
+    <div class="hero-sub">FIFA WORLD CUP 26™</div>
+    <h2>Ma <em>Collection</em></h2>
+    <p>Connecte-toi pour suivre tes 980 stickers et synchroniser ta collection entre tous tes appareils.</p>
+    <button id="signInBtn">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#fff"
+          d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+        <path fill="#fff"
+          d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+          opacity=".85" />
+        <path fill="#fff"
+          d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+          opacity=".7" />
+        <path fill="#fff"
+          d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+          opacity=".55" />
+      </svg>
+      Se connecter avec Google
+    </button>
+  </div>
+
+  <!-- App principale (affichée si connecté) -->
+  <div id="app">
+
+    <div id="offlineBar">Mode hors-ligne — tes changements seront synchronisés au retour du réseau</div>
+
+    <header>
+      <div class="brand">
+        <span class="logo">PANINI</span>
+        <span class="sub">FIFA WORLD CUP 26™</span>
+      </div>
+      <h1>Ma <em>Collection</em></h1>
+      <div id="userBadge">
+        <img id="userPhoto" alt="">
+        <button id="signOutBtn">Déconnexion</button>
+      </div>
+    </header>
+
+    <div class="tabs">
+      <button class="tab active" data-view="collection">Collection</button>
+      <button class="tab" data-view="album">Album</button>
+      <button class="tab" data-view="budget">Budget</button>
+    </div>
+
+    <!-- ===== Vue Collection ===== -->
+    <div class="view active" id="view-collection">
+
+      <div class="progress-card">
+        <div class="progress-top">
+          <span class="progress-label">Progression</span>
+          <span class="progress-count"><span id="ownedCount">0</span><span class="total">/980</span></span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill" style="width:0%"></div>
+        </div>
+        <div class="stats-row">
+          <div class="stat">
+            <div class="stat-val" id="statOwned">0</div>
+            <div class="stat-lbl">Possédés</div>
+          </div>
+          <div class="stat">
+            <div class="stat-val" id="statMissing">980</div>
+            <div class="stat-lbl">Manquants</div>
+          </div>
+          <div class="stat">
+            <div class="stat-val" id="statDupes">0</div>
+            <div class="stat-lbl">Doublons</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="filters">
+        <button class="filter-btn active" data-filter="all">Tout <span class="count" id="cAll"></span></button>
+        <button class="filter-btn" data-filter="owned">Possédés <span class="count" id="cOwned"></span></button>
+        <button class="filter-btn" data-filter="missing">Manquants <span class="count" id="cMissing"></span></button>
+        <button class="filter-btn" data-filter="dupes">Doublons <span class="count" id="cDupes"></span></button>
+      </div>
+
+      <div class="search-wrap">
+        <input type="search" class="search" id="search" placeholder="Rechercher (ex: FRA, ARG12, Brésil...)">
+      </div>
+
+      <main id="teamsContainer"></main>
+
+      <div class="reset-bar">
+        <button class="reset-btn" id="resetBtn">Réinitialiser toute la collection</button>
+      </div>
+
+    </div><!-- /#view-collection -->
+
+    <!-- ===== Vue Album ===== -->
+    <div class="view" id="view-album">
+      <div class="album-header">
+        <div class="album-page-indicator">
+          <span id="albumPageCurrent">1</span><span class="sep">/</span><span id="albumPageTotal">50</span>
+        </div>
+        <div class="album-page-name" id="albumPageName">—</div>
+        <button class="album-index-btn" id="albumIndexBtn" aria-label="Choisir une page">☰</button>
+      </div>
+
+      <div class="album-stage">
+        <button class="album-side-btn album-side-prev" id="albumPrev" aria-label="Précédent">‹</button>
+        <div class="album-viewport" id="albumViewport">
+          <div class="album-track" id="albumTrack">
+            <!-- Pages générées dynamiquement -->
+          </div>
+        </div>
+        <button class="album-side-btn album-side-next" id="albumNext" aria-label="Suivant">›</button>
+      </div>
+    </div><!-- /#view-album -->
+
+    <!-- ===== Vue Budget ===== -->
+    <div class="view" id="view-budget">
+
+      <div class="budget-summary">
+        <div class="budget-total">
+          <div class="budget-total-label">Total dépensé</div>
+          <div class="budget-total-amount"><span id="budgetTotal">0.00</span><span class="currency">CHF</span></div>
+        </div>
+        <div class="budget-stats">
+          <div class="budget-stat">
+            <div class="budget-stat-val" id="budgetPacks">0</div>
+            <div class="budget-stat-lbl">Paquets ouverts</div>
+          </div>
+          <div class="budget-stat">
+            <div class="budget-stat-val"><span id="budgetAvgPack">0.00</span> CHF</div>
+            <div class="budget-stat-lbl">Prix moyen / paquet</div>
+          </div>
+          <div class="budget-stat">
+            <div class="budget-stat-val" id="budgetStickersBought">0</div>
+            <div class="budget-stat-lbl">Stickers achetés</div>
+          </div>
+          <div class="budget-stat">
+            <div class="budget-stat-val"><span id="budgetAvgSticker">0.00</span> CHF</div>
+            <div class="budget-stat-lbl">Prix moyen / sticker</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="purchase-form">
+        <h3 class="form-title">Nouvel achat</h3>
+        <div class="form-row">
+          <div class="form-field">
+            <label for="inputPacks">Paquets</label>
+            <input type="number" id="inputPacks" inputmode="numeric" min="1" step="1" placeholder="1" value="1">
+          </div>
+          <div class="form-field">
+            <label for="inputPrice">Prix total</label>
+            <div class="form-suffix" data-suffix="CHF">
+              <input type="number" id="inputPrice" inputmode="decimal" min="0" step="0.05" placeholder="1.50">
+            </div>
+          </div>
+        </div>
+        <button class="add-btn" id="addPurchaseBtn">Ajouter l'achat</button>
+      </div>
+
+      <div class="purchases-list">
+        <div class="purchases-title">Historique des achats</div>
+        <div id="purchasesContainer"></div>
+      </div>
+
+    </div><!-- /#view-budget -->
+
+    <div class="toast" id="toast"></div>
+
+    <!-- Modale index pages album -->
+    <div class="album-index-backdrop" id="albumIndexModal" onclick="closeAlbumIndex()">
+      <div class="album-index-panel" onclick="event.stopPropagation()">
+        <div class="album-index-header">
+          <div class="album-index-title">Choisir une page</div>
+          <button class="album-index-close" onclick="closeAlbumIndex()">✕</button>
+        </div>
+        <div class="album-index-list" id="albumIndexList"></div>
+      </div>
+    </div>
+
+    <!-- Modale d'action sticker (vue album) -->
+    <div class="album-modal-backdrop" id="albumModal">
+      <div class="album-modal" onclick="event.stopPropagation()">
+        <div class="modal-top">
+          <div class="modal-flag" id="modalFlag">🏳️</div>
+          <div class="modal-info">
+            <div class="modal-title" id="modalTitle">—</div>
+            <div class="modal-sub" id="modalSub">—</div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="modal-btn primary" id="modalToggleOwn">
+            <span id="modalToggleLabel">Marquer comme obtenu</span>
+            <span>✓</span>
+          </button>
+          <button class="modal-btn" id="modalDupesBtn" style="display:none">
+            <span>Doublons</span>
+            <div class="modal-dupe-controls">
+              <button onclick="modalChangeDupes(-1)">−</button>
+              <span class="dupe-val" id="modalDupeCount">0</span>
+              <button onclick="modalChangeDupes(1)">+</button>
+            </div>
+          </button>
+          <button class="modal-btn" onclick="closeAlbumModal()">Fermer</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /#app -->
+
+  <!-- Firebase SDK (modular, via CDN) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection,
+      initializeFirestore, persistentLocalCache, persistentMultipleTabManager
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // ============================================================
+    //  CONFIG FIREBASE
+    // ============================================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyDR93XOqdmnjWo73GZt7xe24DOoQS1wWkM",
+      authDomain: "panini-2026-3c9a5.firebaseapp.com",
+      projectId: "panini-2026-3c9a5",
+      storageBucket: "panini-2026-3c9a5.firebasestorage.app",
+      messagingSenderId: "244225681836",
+      appId: "1:244225681836:web:aa9bf4f0a9a87320baf209"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Firestore avec persistance hors-ligne (cache local IndexedDB)
+    let db;
+    try {
+      db = initializeFirestore(app, {
+        localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+      });
+      console.log('✓ Firestore offline persistence activated');
+    } catch (e) {
+      console.warn('Offline persistence unavailable, falling back:', e);
+      db = getFirestore(app);
+    }
+
+    const provider = new GoogleAuthProvider();
+
+    // On expose ce qu'on a besoin globalement pour le script classique ci-dessous
+    window.fb = {
+      auth, db, provider,
+      signInWithPopup, signOut, onAuthStateChanged,
+      doc, setDoc, deleteDoc, onSnapshot, collection
+    };
+  </script>
+
+  <script src="script.js"></script>
+
+</body>
+
+</html>
