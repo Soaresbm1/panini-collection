@@ -646,8 +646,7 @@
     }
 
     .view.active {
-      display: flex;
-      flex-direction: column;
+      display: block;
       flex: 1;
       min-height: 0;
       overflow-y: auto;
@@ -924,11 +923,12 @@
      VUE ALBUM
      ============================================================ */
     #view-album {
+      display: flex;
+      flex-direction: column;
       overflow: hidden;
       padding-bottom: 0;
       max-width: 1700px;
       margin: 0 auto;
-      flex-direction: column;
       min-height: 0;
     }
 
@@ -1214,10 +1214,11 @@
       position: relative;
       z-index: 1;
       display: grid;
-      gap: 6px;
+      gap: 5px;
       flex: 1;
       min-height: 0;
-      grid-auto-rows: 1fr;
+      align-content: start;
+      grid-auto-rows: clamp(35px, 12vh, 70px);
     }
 
     /* Page 1 : drapeau en cols 1-2, stickers 1-2 en cols 3-4, puis 4+4 */
