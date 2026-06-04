@@ -236,7 +236,7 @@
       currentUser = user;
       if (user) {
         document.getElementById('signedOut').style.display = 'none';
-        document.getElementById('app').style.display = 'block';
+        document.getElementById('app').style.display = 'flex';
         document.getElementById('userBadge').style.display = 'flex';
         const photoEl = document.getElementById('userPhoto');
         if (photoEl && user.photoURL) {

@@ -36,7 +36,11 @@
       background-image:
         radial-gradient(circle at 10% 0%, rgba(227, 23, 62, .06), transparent 40%),
         radial-gradient(circle at 90% 100%, rgba(0, 133, 63, .05), transparent 40%);
-      min-height: 100vh;
+      height: 100dvh;
+      height: 100vh; /* fallback */
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
 
     /* ---------- Header ---------- */
@@ -480,7 +484,8 @@
     /* ---------- Auth ---------- */
     #signedOut {
       display: none;
-      min-height: 100vh;
+      flex: 1;
+      min-height: 0;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -590,10 +595,15 @@
 
     header {
       position: relative;
+      flex-shrink: 0;
     }
 
     #app {
       display: none;
+      flex: 1;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 0;
     }
 
     /* ---------- Tab navigation ---------- */
@@ -601,8 +611,8 @@
       display: flex;
       border-bottom: 2px solid var(--ink);
       background: var(--bg);
-      position: sticky;
-      top: 0;
+      position: relative;
+      flex-shrink: 0;
       z-index: 9;
     }
 
@@ -636,7 +646,11 @@
     }
 
     .view.active {
-      display: block;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
     }
 
     /* ---------- Budget view ---------- */
@@ -911,15 +925,18 @@
      ============================================================ */
     #view-album {
       overflow: hidden;
-      padding-bottom: 20px;
+      padding-bottom: 0;
       max-width: 1700px;
       margin: 0 auto;
+      flex-direction: column;
+      min-height: 0;
     }
 
     .album-header {
       padding: 14px 16px 8px;
       text-align: center;
       position: relative;
+      flex-shrink: 0;
     }
 
     .album-index-btn {
@@ -1412,8 +1429,10 @@
     .album-stage {
       position: relative;
       padding: 0;
+      flex: 1;
+      min-height: 0;
     }
-    .album-stage .album-viewport { width: 100%; min-width: 0; }
+    .album-stage .album-viewport { width: 100%; min-width: 0; height: 100%; }
 
     .album-side-btn {
       position: absolute;
@@ -1666,8 +1685,8 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      position: sticky;
-      top: 0;
+      position: relative;
+      flex-shrink: 0;
       z-index: 20;
       animation: slideDown .25s ease-out;
     }
